@@ -1,5 +1,6 @@
 const roleHarvester = require('role.harvester')
 const roleUpgrader = require('role.upgrader')
+const roleBuilder = require('role.builder')
 
 module.exports.loop = function () {
     
@@ -14,20 +15,30 @@ module.exports.loop = function () {
     console.log('Harvesters: ' + harvesters.length);
     const upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
     console.log('Upgraders: ' + upgraders.length);
+    const builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
+    console.log('Builders: ' + builders.length);
     
-    //if(harvesters.length < 1) {
-        //let newName = 'Harvester' + Game.time;
-        //console.log('Spawning harvester:' + newName);
-        //Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
-            //{memory: {role: 'harvester'}});
-    //}
+    if(harvesters.length < 1) {
+        let newName = 'Harvester' + Game.time;
+        console.log('Spawning harvester:' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
+            {memory: {role: 'harvester'}});
+    }
     
-    if(upgraders.length < 3) {
+    if(upgraders.length < 2) {
         let newName = 'Upgrader' + Game.time;
         console.log('Spawning upgrader:' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
             {memory: {role: 'upgrader'}});
     }
+    
+    if(builders.length < 2) {
+        let newName = 'Builder' + Game.time;
+        console.log('Spawning builder:' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName,
+            {memory: {role: 'builder'}});
+    }
+    
     
     if(Game.spawns['Spawn1'].spawning) {
         const spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
@@ -44,8 +55,11 @@ module.exports.loop = function () {
         if(creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
-        if( creep.memory.role == 'upgrader') {
+        if(creep.memory.role == 'upgrader') {
             roleUpgrader.run(creep);
+        }
+        if(creep.memory.role == 'builder') {
+            roleBuilder.run(creep);
         }
     }
 }
