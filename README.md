@@ -1,4 +1,4 @@
 # ScreepsPlay
-Some code for my Screeps account.
+Some code for my Screeps colony.
 
 <img src="assets/images/Screeps.png">
