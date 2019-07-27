@@ -1,7 +1,13 @@
-const roleHarvester = {
-
-    /** harvester params **/
+const rolePhalanx = {
+    
+    /** phalanx params **/
     run: function(creep) {
+        //const hostiles = Game.rooms[W7S8].find(FIND_HOSTILE_CREEPS);
+        
+        //if(hostiles.length > 0) {
+            //creep.attack(closestHostile);
+        //}
+
         if(creep.carry.energy < creep.carryCapacity) {
             const containers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
@@ -23,8 +29,8 @@ const roleHarvester = {
         else {
             const targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_EXTENSION ||
-                    structure.structureType == STRUCTURE_SPAWN) &&
+                    return (structure.structureType == STRUCTURE_TOWER || 
+                    structure.structureType == STRUCTURE_EXTENSION ) &&
                         structure.energy < structure.energyCapacity;
                 }
             });
@@ -34,8 +40,11 @@ const roleHarvester = {
                 }
             }
         }
-        
     }
+          
 };
+
+
     
-module.exports = roleHarvester;
+
+module.exports = rolePhalanx;

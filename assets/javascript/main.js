@@ -2,24 +2,42 @@ const roleHarvester = require('role.harvester')
 const roleUpgrader = require('role.upgrader')
 const roleBuilder = require('role.builder')
 const roleMiner = require('role.miner')
+const rolePhalanx = require('role.phalanx')
 
 module.exports.loop = function () {
-    
+
     const tower = Game.getObjectById('5d304a5183a670625d51cccf');
-    if(tower) {
-        let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => structure.hits < structure.hitsMax
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
-    }
-    
     const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     if(closestHostile) {
         tower.attack(closestHostile);
     }
+    //if(tower) {
+        //let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+        //filter: (structure) => structure.hits < structure.hitsMax 
+        //});
+        //if(closestDamagedStructure) {
+            //tower.repair(closestDamagedStructure);
+        //}
+    //}
     
+
+    const tower2 = Game.getObjectById('5d37cacb496c401707466f7d');
+    const closestHostile2 = tower2.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+    if(closestHostile2) {
+        tower2.attack(closestHostile2);
+    }
+    if(tower2) {
+        let closestDamagedStructure = tower2.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType == STRUCTURE_CONTAINER) &&
+                structure.hits < structure.hitsMax;
+            }
+        });
+        if(closestDamagedStructure) {
+            tower2.repair(closestDamagedStructure);
+        }
+    }
+
     for(const name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
@@ -35,8 +53,10 @@ module.exports.loop = function () {
     console.log('Builders: ' + builders.length);
     const miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner');
     console.log('Miners: ' + miners.length);
+    const phalanx = _.filter(Game.creeps, (creep) => creep.memory.role == 'phalanx');
+    console.log('Phalanx: ' + phalanx.length);
     
-    if(harvesters.length < 5) {
+    if(harvesters.length < 3) {
         let newName = 'Harvester' + Game.time;
         console.log('Spawning Harvester: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
@@ -46,22 +66,29 @@ module.exports.loop = function () {
     if(upgraders.length < 3) {
         let newName = 'Upgrader' + Game.time;
         console.log('Spawning Upgrader: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,CARRY,MOVE], newName,
             {memory: {role: 'upgrader'}});
     }
     
-    if(builders.length < 3) {
+    if(builders.length < 4) {
         let newName = 'Builder' + Game.time;
         console.log('Spawning Builder: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE], newName,
             {memory: {role: 'builder'}});
     }
     
-    if(miners.length < 2) {
+    if(miners.length < 1) {
         let newName = 'Miner' + Game.time;  
         console.log('Spawning Miner: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,MOVE], newName,
             {memory: {role: 'miner'}});
+    }
+    
+    if(phalanx.length < 2) {
+        let newName = 'Phalanx' + Game.time;
+        console.log('Spawning Phalanx: ' + newName);
+        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
+            {memory: {role: 'phalanx'}});
     }
     
     if(Game.spawns['Spawn1'].spawning) {
@@ -87,6 +114,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'miner') {
             roleMiner.run(creep);
+        }
+        if(creep.memory.role == 'phalanx') {
+            rolePhalanx.run(creep);    
         }
     }
 }
