@@ -2,11 +2,10 @@ const rolePhalanx = {
     
     /** phalanx params **/
     run: function(creep) {
-        //const hostiles = Game.rooms[W7S8].find(FIND_HOSTILE_CREEPS);
-        
-        //if(hostiles.length > 0) {
-            //creep.attack(closestHostile);
-        //}
+        const closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if(closestHostile) {
+            creep.attack(closestHostile);
+        }
 
         if(creep.carry.energy < creep.carryCapacity) {
             const containers = creep.room.find(FIND_STRUCTURES, {
@@ -29,8 +28,7 @@ const rolePhalanx = {
         else {
             const targets = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_TOWER || 
-                    structure.structureType == STRUCTURE_EXTENSION ) &&
+                    return (structure.structureType == STRUCTURE_TOWER) &&
                         structure.energy < structure.energyCapacity;
                 }
             });

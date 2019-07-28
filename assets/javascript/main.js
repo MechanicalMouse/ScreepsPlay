@@ -11,14 +11,17 @@ module.exports.loop = function () {
     if(closestHostile) {
         tower.attack(closestHostile);
     }
-    //if(tower) {
-        //let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-        //filter: (structure) => structure.hits < structure.hitsMax 
-        //});
-        //if(closestDamagedStructure) {
-            //tower.repair(closestDamagedStructure);
-        //}
-    //}
+    if(tower) {
+        let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (structure.structureType == STRUCTURE_ROAD) &&
+                structure.hits < structure.hitsMax;
+            }
+        });
+        if(closestDamagedStructure) {
+            tower.repair(closestDamagedStructure);
+        }
+    }
     
 
     const tower2 = Game.getObjectById('5d37cacb496c401707466f7d');
@@ -29,7 +32,8 @@ module.exports.loop = function () {
     if(tower2) {
         let closestDamagedStructure = tower2.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType == STRUCTURE_CONTAINER) &&
+                return (structure.structureType == STRUCTURE_CONTAINER ||
+                structure.structureType == STRUCTURE_ROAD) &&
                 structure.hits < structure.hitsMax;
             }
         });
@@ -80,14 +84,14 @@ module.exports.loop = function () {
     if(miners.length < 1) {
         let newName = 'Miner' + Game.time;  
         console.log('Spawning Miner: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,WORK,MOVE], newName,
             {memory: {role: 'miner'}});
     }
     
     if(phalanx.length < 2) {
         let newName = 'Phalanx' + Game.time;
         console.log('Spawning Phalanx: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([TOUGH,ATTACK,ATTACK,WORK,CARRY,CARRY,MOVE], newName,
             {memory: {role: 'phalanx'}});
     }
     
