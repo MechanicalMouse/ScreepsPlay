@@ -11,17 +11,17 @@ module.exports.loop = function () {
     if(closestHostile) {
         tower.attack(closestHostile);
     }
-    if(tower) {
-        let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            filter: (structure) => {
-                return (structure.structureType == STRUCTURE_ROAD) &&
-                structure.hits < structure.hitsMax;
-            }
-        });
-        if(closestDamagedStructure) {
-            tower.repair(closestDamagedStructure);
-        }
-    }
+    //if(tower) {
+        //let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
+            //filter: (structure) => {
+                //return (structure.structureType == STRUCTURE_ROAD) &&
+                //structure.hits < structure.hitsMax;
+            //}
+        //});
+        //if(closestDamagedStructure) {
+            //tower.repair(closestDamagedStructure);
+        //}
+    //}
     
 
     const tower2 = Game.getObjectById('5d37cacb496c401707466f7d');
@@ -32,7 +32,8 @@ module.exports.loop = function () {
     if(tower2) {
         let closestDamagedStructure = tower2.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
-                return (structure.structureType == STRUCTURE_CONTAINER ||
+                return (//structure.structureType == STRUCTURE_RAMPART ||
+                structure.structureType == STRUCTURE_CONTAINER ||
                 structure.structureType == STRUCTURE_ROAD) &&
                 structure.hits < structure.hitsMax;
             }
@@ -60,7 +61,7 @@ module.exports.loop = function () {
     const phalanx = _.filter(Game.creeps, (creep) => creep.memory.role == 'phalanx');
     console.log('Phalanx: ' + phalanx.length);
     
-    if(harvesters.length < 3) {
+    if(harvesters.length < 4) {
         let newName = 'Harvester' + Game.time;
         console.log('Spawning Harvester: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
@@ -74,7 +75,7 @@ module.exports.loop = function () {
             {memory: {role: 'upgrader'}});
     }
     
-    if(builders.length < 4) {
+    if(builders.length < 3) {
         let newName = 'Builder' + Game.time;
         console.log('Spawning Builder: ' + newName);
         Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE], newName,
@@ -91,7 +92,7 @@ module.exports.loop = function () {
     if(phalanx.length < 2) {
         let newName = 'Phalanx' + Game.time;
         console.log('Spawning Phalanx: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([TOUGH,ATTACK,ATTACK,WORK,CARRY,CARRY,MOVE], newName,
+        Game.spawns['Spawn1'].spawnCreep([TOUGH,WORK,CARRY,CARRY,MOVE,ATTACK,ATTACK], newName,
             {memory: {role: 'phalanx'}});
     }
     

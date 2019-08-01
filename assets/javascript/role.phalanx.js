@@ -2,6 +2,7 @@ const rolePhalanx = {
     
     /** phalanx params **/
     run: function(creep) {
+        
         const closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
         if(closestHostile) {
             creep.attack(closestHostile);
@@ -32,9 +33,16 @@ const rolePhalanx = {
                         structure.energy < structure.energyCapacity;
                 }
             });
+        
             if(targets.length > 0) {
                 if(creep.transfer(targets[0], RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(targets[0]);
+                }
+            }
+            else {
+                const hoard = creep.room.storage;
+                if(creep.transfer(hoard, 'energy', creep.carry[0]) == ERR_NOT_IN_RANGE) {
+                    creep.moveTo(hoard, {visualizePathStyle: {stroke: '#00ff00'}});
                 }
             }
         }
