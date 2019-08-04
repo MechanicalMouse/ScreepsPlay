@@ -1,6 +1,6 @@
 const rolePhalanx = {
     
-    /** phalanx params **/
+    /** Phalanx params **/
     run: function(creep) {
         
         const closestHostile = creep.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
@@ -11,7 +11,8 @@ const rolePhalanx = {
         if(creep.carry.energy < creep.carryCapacity) {
             const containers = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return (structure.structureType == STRUCTURE_CONTAINER) && (structure.store[RESOURCE_ENERGY] > 0);
+                    return (structure.structureType == STRUCTURE_CONTAINER)
+                     && (structure.store[RESOURCE_ENERGY] > 0);
                 }
             });
             const source = creep.pos.findClosestByPath(containers);

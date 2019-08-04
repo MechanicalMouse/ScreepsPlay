@@ -1,8 +1,16 @@
 const roleBuilder = {
     
-    /** builder params **/
+    /** Builder params **/
     run: function(creep) {
         
+        /*If target room is defined and creep is not in it*/
+        if (creep.memory.target != undefined && creep.room.name != creep.memory.target) {
+            /*Find exit, move to it*/
+            const exit = creep.room.findExitTo(creep.memory.target);
+            creep.moveTo(creep.pos.findClosestByRange(exit));
+            return;
+        }
+
         if(creep.memory.building && creep.carry.energy == 0) {
             creep.memory.building = false;
             creep.say('Harvest');
@@ -42,9 +50,11 @@ const roleBuilder = {
                 creep.moveTo(source);
             }
             
-            const sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0,1]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0,1]);
+            const sources = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+            // try to harvest energy, if the source is not in range
+            if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
+                // move towards the source
+                creep.moveTo(sources);
             }
         }
     }

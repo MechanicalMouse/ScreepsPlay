@@ -1,11 +1,14 @@
-const roleHarvester = require('role.harvester')
-const roleUpgrader = require('role.upgrader')
-const roleBuilder = require('role.builder')
-const roleMiner = require('role.miner')
-const rolePhalanx = require('role.phalanx')
+/*Require job modules*/
+const roleHarvester = require('role.harvester');
+const roleUpgrader = require('role.upgrader');
+const roleBuilder = require('role.builder');
+const roleMiner = require('role.miner');
+const rolePhalanx = require('role.phalanx');
+const rolePioneer = require('role.pioneer');
 
 module.exports.loop = function () {
 
+    /*Tower code*/
     const tower = Game.getObjectById('5d304a5183a670625d51cccf');
     const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
     if(closestHostile) {
@@ -42,7 +45,9 @@ module.exports.loop = function () {
             tower2.repair(closestDamagedStructure);
         }
     }
+    /*End of tower code*/
 
+    /*Clear memory if a creep dies*/
     for(const name in Memory.creeps) {
         if(!Game.creeps[name]) {
             delete Memory.creeps[name];
@@ -50,61 +55,85 @@ module.exports.loop = function () {
         }
     }
     
-    const harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
-    console.log('Harvesters: ' + harvesters.length);
-    const upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
-    console.log('Upgraders: ' + upgraders.length);
-    const builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-    console.log('Builders: ' + builders.length);
-    const miners = _.filter(Game.creeps, (creep) => creep.memory.role == 'miner');
-    console.log('Miners: ' + miners.length);
-    const phalanx = _.filter(Game.creeps, (creep) => creep.memory.role == 'phalanx');
-    console.log('Phalanx: ' + phalanx.length);
+    /*Track how many of each creep, console.log current number*/
+    for (let spawnName in Game.spawns) {
+      let spawn = Game.spawns[spawnName];
+      let creepsInRoom = spawn.room.find(FIND_CREEPS);
+
+        const harvesters = _.filter(creepsInRoom, (creep) => creep.memory.role == 'harvester');
+        console.log('Harvesters: ' + harvesters.length);
+        const upgraders = _.filter(creepsInRoom, (creep) => creep.memory.role == 'upgrader');
+        console.log('Upgraders: ' + upgraders.length);
+        const builders = _.filter(creepsInRoom, (creep) => creep.memory.role == 'builder');
+        console.log('Builders: ' + builders.length);
+        const miners = _.filter(creepsInRoom, (creep) => creep.memory.role == 'miner');
+        console.log('Miners: ' + miners.length);
+        const phalanx = _.filter(creepsInRoom, (creep) => creep.memory.role == 'phalanx');
+        console.log('Phalanx: ' + phalanx.length);
     
-    if(harvesters.length < 4) {
-        let newName = 'Harvester' + Game.time;
-        console.log('Spawning Harvester: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
-            {memory: {role: 'harvester'}});
-    }
     
-    if(upgraders.length < 3) {
-        let newName = 'Upgrader' + Game.time;
-        console.log('Spawning Upgrader: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,CARRY,MOVE], newName,
-            {memory: {role: 'upgrader'}});
-    }
+        /*Spawn codes and amounts for each creep type*/
+        let newName = undefined;
     
-    if(builders.length < 3) {
-        let newName = 'Builder' + Game.time;
-        console.log('Spawning Builder: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,CARRY,CARRY,MOVE], newName,
-            {memory: {role: 'builder'}});
-    }
+        if(harvesters.length < 4) {
+            newName = 'Harvester' + Game.time;
+            console.log('Spawning Harvester: ' + newName);
+            spawn.spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
+                {memory: {role: 'harvester'}});
+        }
     
-    if(miners.length < 1) {
-        let newName = 'Miner' + Game.time;  
-        console.log('Spawning Miner: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,WORK,WORK,WORK,WORK,MOVE], newName,
-            {memory: {role: 'miner'}});
-    }
+        if (spawn.memory.claimRoom != undefined) {
+            newName = 'Pioneer' + spawn.memory.claimRoom;
+            console.log('Spawning Pioneer: ' + newName);
+            spawn.spawnCreep([CLAIM,MOVE], newName,
+                {memory: {role: 'pioneer'}});
+            if (!(newName < 0)) {
+                /*When pioneer creep is spawned, remove room from the list*/
+                delete spawn.memory.claimRoom;
+            }
+        }
     
-    if(phalanx.length < 2) {
-        let newName = 'Phalanx' + Game.time;
-        console.log('Spawning Phalanx: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([TOUGH,WORK,CARRY,CARRY,MOVE,ATTACK,ATTACK], newName,
-            {memory: {role: 'phalanx'}});
-    }
+        if(upgraders.length < 3) {
+            newName = 'Upgrader' + Game.time;
+            console.log('Spawning Upgrader: ' + newName);
+            spawn.spawnCreep([WORK,WORK,CARRY,CARRY,CARRY,MOVE], newName,
+                {memory: {role: 'upgrader'}});
+        }
+        
+        if(builders.length < 5) {
+            newName = 'Builder' + Game.time;
+            console.log('Spawning Builder: ' + newName);
+            spawn.spawnCreep([WORK,WORK,CARRY,CARRY,MOVE], newName,
+                {memory: {role: 'builder'}});
+        }
     
-    if(Game.spawns['Spawn1'].spawning) {
-        const spawningCreep = Game.creeps[Game.spawns['Spawn1'].spawning.name];
-        Game.spawns['Spawn1'].room.visual.text(
+        if(miners.length < 1) {
+            newName = 'Miner' + Game.time;  
+            console.log('Spawning Miner: ' + newName);
+            spawn.spawnCreep([WORK,WORK,WORK,WORK,WORK,MOVE], newName,
+                {memory: {role: 'miner'}});
+        }
+    
+        if(phalanx.length < 2) {
+            newName = 'Phalanx' + Game.time;
+            console.log('Spawning Phalanx: ' + newName);
+            spawn.spawnCreep([TOUGH,WORK,CARRY,CARRY,MOVE,ATTACK,ATTACK], newName,
+                {memory: {role: 'phalanx'}});
+        }
+        /*End of creep type spawn codes*/
+
+        /*Spawner announces what it's spawning*/
+        if(spawn.spawning) {
+        const spawningCreep = Game.creeps[spawn.spawning.name];
+            spawn.room.visual.text(
             spawningCreep.memory.role,
-            Game.spawns['Spawn1'].pos.x + 1,
-            Game.spawns['Spawn1'].pos.y,
+            spawn.pos.x + 1,
+            spawn.pos.y,
             {align: 'left', opacity: 0.8});
+        }
     }
-    
+
+    /*Using roles assigned at spawn, run the job module*/
     for(const name in Game.creeps) {
         const creep = Game.creeps[name];
         
@@ -122,6 +151,9 @@ module.exports.loop = function () {
         }
         if(creep.memory.role == 'phalanx') {
             rolePhalanx.run(creep);    
+        }
+        if(creep.memory.role == 'pioneer') {
+            rolePioneer.run(creep);    
         }
     }
 }
