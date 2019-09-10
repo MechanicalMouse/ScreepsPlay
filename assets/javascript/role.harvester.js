@@ -11,15 +11,20 @@ const roleHarvester = {
                 }
             });
 
-            const source = creep.pos.findClosestByPath(containers);
+            //const source = creep.room.storage;
+            let source = creep.pos.findClosestByPath(containers);
             if(creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(source);
             }
-            
-            const sources = creep.room.find(FIND_SOURCES);
-            if(creep.harvest(sources[0,1]) == ERR_NOT_IN_RANGE) {
-                creep.moveTo(sources[0,1]);
-                creep.say('Harvest')
+            //if (source == undefined) {
+                //source = creep.room.storage;
+            //}
+
+            const sources = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+            // try to harvest energy, if the source is not in range...
+            if (creep.harvest(sources) == ERR_NOT_IN_RANGE) {
+                // ...move towards the source
+                creep.moveTo(sources);
             }
         }
         else {

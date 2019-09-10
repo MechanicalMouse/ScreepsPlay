@@ -4,6 +4,14 @@ const roleMiner = {
     /** Miner params **/
     run: function(creep) {
         
+        /*If target room is defined and creep is not in it*/
+        if (creep.memory.target != undefined && creep.room.name != creep.memory.target) {
+            /*Find exit, move to it*/
+            const exit = creep.room.findExitTo(creep.memory.target);
+            creep.moveTo(creep.pos.findClosestByRange(exit));
+            return;
+        }
+
         /*Find container to mine into*/
         const targets = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {

@@ -9,31 +9,20 @@ const rolePioneer = require('role.pioneer');
 module.exports.loop = function () {
 
     /*Tower code*/
-    const tower = Game.getObjectById('5d304a5183a670625d51cccf');
-    const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(closestHostile) {
-        tower.attack(closestHostile);
+    const towers = _.filter(Game.structures, structure => structure.structureType == STRUCTURE_TOWER);
+    //for each tower
+    for (let tower of towers) {
+        //find closes hostile creep
+        const target = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        /*If target is found, attack*/
+        if (target != undefined) {
+            tower.attack(target);
+        }
     }
-    //if(tower) {
-        //let closestDamagedStructure = tower.pos.findClosestByRange(FIND_STRUCTURES, {
-            //filter: (structure) => {
-                //return (structure.structureType == STRUCTURE_ROAD) &&
-                //structure.hits < structure.hitsMax;
-            //}
-        //});
-        //if(closestDamagedStructure) {
-            //tower.repair(closestDamagedStructure);
-        //}
-    //}
-    
 
-    const tower2 = Game.getObjectById('5d37cacb496c401707466f7d');
-    const closestHostile2 = tower2.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(closestHostile2) {
-        tower2.attack(closestHostile2);
-    }
-    if(tower2) {
-        let closestDamagedStructure = tower2.pos.findClosestByRange(FIND_STRUCTURES, {
+    const tower1 = Game.getObjectById('5d37cacb496c401707466f7d');
+    if(tower1) {
+        let closestDamagedStructure = tower1.pos.findClosestByRange(FIND_STRUCTURES, {
             filter: (structure) => {
                 return (//structure.structureType == STRUCTURE_RAMPART ||
                 structure.structureType == STRUCTURE_CONTAINER ||
@@ -42,9 +31,25 @@ module.exports.loop = function () {
             }
         });
         if(closestDamagedStructure) {
+            tower1.repair(closestDamagedStructure);
+        }
+    }
+
+    const tower2 = Game.getObjectById('5d48bc9573beb779f0885c4e');
+    if(tower2) {
+        let closestDamagedStructure = tower2.pos.findClosestByRange(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return (//structure.structureType == STRUCTURE_RAMPART ||
+                structure.structureType == STRUCTURE_CONTAINER ||
+                structure.structureType == STRUCTURE_ROAD) &&
+                structure.hits < structure.hitsMax;
+        }
+        });
+        if(closestDamagedStructure) {
             tower2.repair(closestDamagedStructure);
         }
     }
+
     /*End of tower code*/
 
     /*Clear memory if a creep dies*/
@@ -58,7 +63,7 @@ module.exports.loop = function () {
     /*Track how many of each creep, console.log current number*/
     for (let spawnName in Game.spawns) {
       let spawn = Game.spawns[spawnName];
-      let creepsInRoom = spawn.room.find(FIND_CREEPS);
+      let creepsInRoom = spawn.room.find(FIND_MY_CREEPS);
 
         const harvesters = _.filter(creepsInRoom, (creep) => creep.memory.role == 'harvester');
         console.log('Harvesters: ' + harvesters.length);
@@ -75,7 +80,7 @@ module.exports.loop = function () {
         /*Spawn codes and amounts for each creep type*/
         let newName = undefined;
     
-        if(harvesters.length < 4) {
+        if(harvesters.length < 3) {
             newName = 'Harvester' + Game.time;
             console.log('Spawning Harvester: ' + newName);
             spawn.spawnCreep([WORK,CARRY,CARRY,CARRY,MOVE], newName,
@@ -100,7 +105,7 @@ module.exports.loop = function () {
                 {memory: {role: 'upgrader'}});
         }
         
-        if(builders.length < 5) {
+        if(builders.length < 3) {
             newName = 'Builder' + Game.time;
             console.log('Spawning Builder: ' + newName);
             spawn.spawnCreep([WORK,WORK,CARRY,CARRY,MOVE], newName,
@@ -150,10 +155,10 @@ module.exports.loop = function () {
             roleMiner.run(creep);
         }
         if(creep.memory.role == 'phalanx') {
-            rolePhalanx.run(creep);    
+            rolePhalanx.run(creep);  
         }
         if(creep.memory.role == 'pioneer') {
-            rolePioneer.run(creep);    
+            rolePioneer.run(creep);  
         }
     }
 }

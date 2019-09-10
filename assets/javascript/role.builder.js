@@ -26,7 +26,7 @@ const roleBuilder = {
                 creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
             }
             else {
-                let targets = creep.room.find(FIND_STRUCTURES, {
+                targets = creep.room.find(FIND_STRUCTURES, {
                     filter: object => object.hits < object.hitsMax
                 });
                 
@@ -45,9 +45,13 @@ const roleBuilder = {
                     return (structure.structureType == STRUCTURE_CONTAINER) && (structure.store[RESOURCE_ENERGY] > 0);
                 }
             });
-            const source = creep.pos.findClosestByPath(containers);
+            let source = creep.pos.findClosestByPath(containers);
             if(creep.withdraw(source, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) {
                 creep.moveTo(source);
+                
+            }
+            if (source == undefined) {
+                source = creep.room.storage;
             }
             
             const sources = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
@@ -58,6 +62,6 @@ const roleBuilder = {
             }
         }
     }
-}
+};
 
 module.exports = roleBuilder;
